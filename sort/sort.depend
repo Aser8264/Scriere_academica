@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1774475956 source:c:\users\aserb\desktop\faculta\scriere_academica\sort\main.cpp
+	<iostream>
+	<chrono>
+	<cstdio>
+	<cstring>
+	<cstdlib>
+	<cmath>
+	<algorithm>
+
