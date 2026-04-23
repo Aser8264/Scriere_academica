@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <algorithm>
+#include <limits>
 using namespace std;
 using namespace chrono;
 
@@ -110,6 +111,63 @@ void heap_sort(int n, int arr[]) {
     }
 }
 
+void shell_sort(int n, int arr[]) {
+    int gap = 1;
+    while (gap < n / 3)
+        gap = 3 * gap + 1;
+
+    while (gap >= 1) {
+        for (int i = gap; i < n; i++) {
+            int value = arr[i];
+            int j = i;
+
+            while (j >= gap && arr[j - gap] > value) {
+                arr[j] = arr[j - gap];
+                j -= gap;
+            }
+
+            arr[j] = value;
+        }
+
+        gap /= 3;
+    }
+}
+
+void radix_sort(int n, int arr[]) {
+    if (n < 2) return;
+
+    int* output = new int[n];
+    int count[256];
+
+    for (int shift = 0; shift < 32; shift += 8) {
+        memset(count, 0, sizeof(count));
+
+        for (int i = 0; i < n; i++) {
+            // Flip the sign bit so signed integers are ordered correctly.
+            unsigned int key = static_cast<unsigned int>(arr[i]) ^ 0x80000000u;
+            int bucket = (key >> shift) & 255u;
+            count[bucket]++;
+        }
+
+        for (int i = 1; i < 256; i++)
+            count[i] += count[i - 1];
+
+        for (int i = n - 1; i >= 0; i--) {
+            unsigned int key = static_cast<unsigned int>(arr[i]) ^ 0x80000000u;
+            int bucket = (key >> shift) & 255u;
+            output[--count[bucket]] = arr[i];
+        }
+
+        memcpy(arr, output, (size_t)n * sizeof(int));
+    }
+
+    delete[] output;
+}
+
+void intro_sort(int n, int arr[]) {
+    sort(arr, arr + n);
+}
+
 // ===================== Data Generators =====================
 
 void gen_random(int* arr, int n) {
@@ -151,6 +209,15 @@ struct Algorithm {
     const char* name;
     void (*func)(int, int*);
     bool quadratic;
+    int max_size;
+    int memory_profile;
+};
+
+enum MemoryProfile {
+    MEMORY_CONSTANT,
+    MEMORY_LOG_STACK,
+    MEMORY_LINEAR,
+    MEMORY_RADIX
 };
 
 struct Generator {
@@ -162,12 +229,15 @@ int main() {
     srand(42);
 
     Algorithm algos[] = {
-        {"BubbleSort",    bubble_sort,    true},
-        {"InsertionSort", insertion_sort, true},
-        {"SelectionSort", selection_sort, true},
-        {"MergeSort",     merge_sort,     false},
-        {"QuickSort",     quick_sort,     false},
-        {"HeapSort",      heap_sort,      false},
+        {"BubbleSort",    bubble_sort,    true,  100000,                          MEMORY_CONSTANT},
+        {"InsertionSort", insertion_sort, true,  100000,                          MEMORY_CONSTANT},
+        {"SelectionSort", selection_sort, true,  100000,                          MEMORY_CONSTANT},
+        {"MergeSort",     merge_sort,     false, numeric_limits<int>::max(),      MEMORY_LINEAR},
+        {"QuickSort",     quick_sort,     false, numeric_limits<int>::max(),      MEMORY_LOG_STACK},
+        {"HeapSort",      heap_sort,      false, numeric_limits<int>::max(),      MEMORY_CONSTANT},
+        {"ShellSort",     shell_sort,     false, 500000,                          MEMORY_CONSTANT},
+        {"RadixSort",     radix_sort,     false, numeric_limits<int>::max(),      MEMORY_RADIX},
+        {"IntroSort",     intro_sort,     false, numeric_limits<int>::max(),      MEMORY_LOG_STACK},
     };
     int num_algos = sizeof(algos) / sizeof(algos[0]);
 
@@ -183,8 +253,6 @@ int main() {
     int sizes[] = {10, 20, 50, 100, 500, 1000, 5000, 10000,
                    50000};
     int num_sizes = sizeof(sizes) / sizeof(sizes[0]);
-
-    int max_quadratic = 100000;
 
     FILE* csv = fopen("results.csv", "w");
     if (!csv) {
@@ -206,8 +274,7 @@ int main() {
             gens[gi].func(source, n);
 
             for (int ai = 0; ai < num_algos; ai++) {
-                // Skip O(n^2) algorithms for large inputs
-                if (algos[ai].quadratic && n > max_quadratic) {
+                if (n > algos[ai].max_size) {
                     fprintf(csv, "%s,%s,%d,0,SKIPPED,SKIPPED,SKIPPED,SKIPPED\n",
                             algos[ai].name, gens[gi].name, n);
                     fflush(csv);
@@ -250,12 +317,20 @@ int main() {
 
                 // Memory calculation
                 size_t extra_mem;
-                if (strcmp(algos[ai].name, "MergeSort") == 0)
-                    extra_mem = array_mem; // O(n) temp arrays
-                else if (strcmp(algos[ai].name, "QuickSort") == 0)
-                    extra_mem = (size_t)(log2((double)n) * 4 * sizeof(int)); // O(log n) stack
-                else
-                    extra_mem = 3 * sizeof(int); // O(1) extra
+                switch (algos[ai].memory_profile) {
+                    case MEMORY_LINEAR:
+                        extra_mem = array_mem; // O(n) temporary arrays
+                        break;
+                    case MEMORY_LOG_STACK:
+                        extra_mem = (size_t)(max(1.0, ceil(log2((double)max(2, n))))) * 4 * sizeof(int);
+                        break;
+                    case MEMORY_RADIX:
+                        extra_mem = array_mem + 256 * sizeof(int); // output buffer + counting buckets
+                        break;
+                    default:
+                        extra_mem = 3 * sizeof(int); // O(1) extra
+                        break;
+                }
 
                 size_t total_mem = array_mem + extra_mem;
 
