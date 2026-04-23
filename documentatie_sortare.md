@@ -327,3 +327,23 @@ După execuție, fișierul `results.csv` este generat sau actualizat automat.
 Proiectul demonstrează în mod clar diferențele dintre algoritmii de sortare clasici și cei mai performanți. Algoritmii simpli sunt utili pentru învățare și pentru intrări mici, însă pentru volume mai mari devine necesară utilizarea unor metode mai eficiente, precum Merge Sort, Quick Sort, Radix Sort sau IntroSort.
 
 Din perspectivă academică, proiectul este relevant deoarece combină teoria algoritmilor cu măsurători practice și oferă o bază solidă pentru formularea unor concluzii argumentate privind performanța și consumul de memorie.
+
+## 15. Bibliografie
+
+Bibliografia de mai jos reunește principalele surse externe folosite pentru fundamentarea teoretică a algoritmilor, pentru contextul istoric al metodelor prezentate și pentru elementele de bibliotecă standard C++ utilizate în implementare. Lista este prezentată fără adrese URL, într-un format potrivit pentru un raport academic.
+
+[1] Cormen, Thomas H.; Leiserson, Charles E.; Rivest, Ronald L.; Stein, Clifford. *Introduction to Algorithms*, ediția a 4-a, The MIT Press, Cambridge, 2022.
+
+[2] Sedgewick, Robert; Wayne, Kevin. *Algorithms*, ediția a 4-a, Addison-Wesley Professional, 2011.
+
+[3] Knuth, Donald E. *The Art of Computer Programming, Volume 3: Sorting and Searching*, ediția a 2-a, Addison-Wesley, Reading, Massachusetts, 1998.
+
+[4] Shell, D. L. “A High-Speed Sorting Procedure”, *Communications of the ACM*, vol. 2, nr. 7, 1959, pp. 30-32.
+
+[5] Musser, David R. “Introspective Sorting and Selection Algorithms”, *Software: Practice and Experience*, vol. 27, nr. 8, 1997, pp. 983-993.
+
+[6] Bentley, Jon L.; McIlroy, M. Douglas. “Engineering a Sort Function”, *Software: Practice and Experience*, vol. 23, nr. 11, 1993, pp. 1249-1265.
+
+[7] cppreference.com. *std::sort* - documentație de referință pentru biblioteca standard C++, consultată în aprilie 2026.
+
+[8] cppreference.com. *std::chrono* - documentație de referință pentru biblioteca standard C++, consultată în aprilie 2026.
