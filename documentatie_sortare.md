@@ -4,7 +4,7 @@
 ## Universitatea de Vest din Timișoara
 ## Facultatea de Informatică
 ## Realizat de: Bosioc Aser
-## Email: aserbosioc@gmail.com
+## Email: aser.bosioc07@e-uvt.ro
 
 ---
 
